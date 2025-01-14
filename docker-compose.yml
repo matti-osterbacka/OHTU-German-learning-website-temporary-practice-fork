@@ -1,0 +1,21 @@
+version: "3.6"
+services:
+  db:
+    image: postgres:15
+    container_name: gradesa-db
+    environment:
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: tsoha
+      POSTGRES_DB: gradesa
+    volumes:
+      - pg-data:/var/lib/postgresql/data/
+      - ./provision_db.sql:/docker-entrypoint-initdb.d/1_provision_db.sql
+    restart: unless-stopped
+    ports:
+      - "6543:5432"
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "tsoha"]
+      interval: 10s
+      retries: 20
+volumes:
+  pg-data:
