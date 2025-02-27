@@ -1,10 +1,10 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState(null);
 
@@ -12,30 +12,29 @@ export default function Register() {
     event.preventDefault();
     if (email === "" || password === "") {
       setError(true);
+      setSubmitted(false);
     } else {
       setSubmitted(true);
       setError(false);
+
+      setTimeout(() => {
+        window.location.href = "/auth/login";
+      }, 1500);
     }
   };
+
   const successMessage = () => {
-    return (
-      <div className="success">
-        {!!submitted && <h1>Benutzer {email} erfolgreich registriert</h1>}
+    return submitted ? (
+      <div className="success-message">
+        Benutzer {email} erfolgreich registriert
       </div>
-    );
+    ) : null;
   };
 
   const errorMessage = () => {
-    return (
-      <div
-        className="error"
-        style={{
-          display: error ? "" : "none",
-        }}
-      >
-        <h1>Bitte alle Felder ausfüllen</h1>
-      </div>
-    );
+    return error ? (
+      <div className="error-message">Bitte alle Felder ausfüllen</div>
+    ) : null;
   };
 
   return (
@@ -77,10 +76,21 @@ export default function Register() {
           />
         </div>
 
-        <button onClick={handleSubmit} type="submit" className="form-button">
+        <button
+          onClick={handleSubmit}
+          type="submit"
+          className="form-button"
+          style={{ marginBottom: "20px" }}
+        >
           Registrieren
         </button>
       </form>
+
+      <div className="navigate-login">
+        <p>
+          Bereits registriert? <Link href="/auth/login">Anmelden</Link>
+        </p>
+      </div>
     </>
   );
 }
