@@ -1,48 +1,55 @@
 "use client";
 import { useState } from "react";
+import { useRequest } from "@/shared/hooks/useRequest";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [submitted, setSubmitted] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
+  const router = useRouter();
+
+  const makeRequest = useRequest();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (email === "" || password === "") {
-      setError(true);
-      setSubmitted(false);
-    } else {
+    try {
+      const data = await makeRequest("/auth/register", { email, password });
       setSubmitted(true);
-      setError(false);
-
       setTimeout(() => {
-        window.location.href = "/auth/login";
-      }, 1500);
+        router.push("/auth/login");
+      }, 2000);
+      setError("");
+    } catch (error) {
+      setError(error.message);
+      setSubmitted(false);
     }
   };
 
   const successMessage = () => {
-    return submitted ? (
-      <div className="success-message">
-        Benutzer {email} erfolgreich registriert
+    return (
+      <div className="success">
+        <h1>Benutzer erfolgreich registriert</h1>
       </div>
-    ) : null;
+    );
   };
 
   const errorMessage = () => {
-    return error ? (
-      <div className="error-message">Bitte alle Felder ausfüllen</div>
-    ) : null;
+    return (
+      <div className="error">
+        <h1>{error}</h1>
+      </div>
+    );
   };
 
   return (
     <>
       <h1 className="auth-title">Registrieren</h1>
       <div className="messages">
-        {errorMessage()}
-        {successMessage()}
+        {!!error && errorMessage()}
+        {submitted && successMessage()}
       </div>
 
       <form onSubmit={handleSubmit}>
