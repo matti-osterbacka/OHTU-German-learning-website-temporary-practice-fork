@@ -90,7 +90,8 @@ CREATE TABLE public.users (
   password_hash text NOT NULL,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
-  salt text NOT NULL
+  salt text NOT NULL,
+  username text NOT NULL
 );
 
 ALTER TABLE public.user_question_answers
