@@ -75,6 +75,16 @@
   --primary8: hsl(213, 90%, 50%);
   --primary9: hsl(213, 90%, 45%);
 
+  --green1: hsl(120, 60%, 90%);
+  --green2: hsl(120, 60%, 80%);
+  --green3: hsl(120, 60%, 70%);
+  --green4: hsl(120, 60%, 60%);
+  --green5: hsl(120, 60%, 50%);
+  --green6: hsl(120, 60%, 40%);
+  --green7: hsl(120, 60%, 30%);
+  --green8: hsl(120, 60%, 20%);
+  --green9: hsl(120, 60%, 10%);
+
   /* font sizes */
   --font-xs: 8px;
   --font-sm: 12px;
@@ -154,7 +164,18 @@
     --tertiary7: hsl(351, 40%, 85%);
     --tertiary8: hsl(351, 40%, 90%);
     --tertiary9: hsl(351, 40%, 95%);
+
+    --secondary1: hsl(178, 60%, 30%);
+    --secondary2: hsl(178, 60%, 40%);
+    --secondary3: hsl(178, 80%, 52%);
+    --secondary4: hsl(178, 60%, 60%);
+    --secondary5: hsl(178, 60%, 70%);
+    --secondary6: hsl(178, 60%, 80%);
+    --secondary7: hsl(178, 60%, 85%);
+    --secondary8: hsl(178, 60%, 90%);
+    --secondary9: hsl(178, 60%, 95%);
     --tertiary10: hsl(113, 93%, 49%);
+
 
     --secondary1: hsl(178, 60%, 30%);
     --secondary2: hsl(178, 60%, 40%);
@@ -175,6 +196,17 @@
     --primary7: hsl(213, 45%, 45%);
     --primary8: hsl(213, 45%, 50%);
     --primary9: hsl(213, 45%, 55%);
+
+    --green1: hsl(120, 40%, 30%);
+    --green2: hsl(120, 40%, 40%);
+    --green3: hsl(120, 40%, 50%);
+    --green4: hsl(120, 40%, 60%);
+    --green5: hsl(120, 40%, 70%);
+    --green6: hsl(120, 40%, 80%);
+    --green7: hsl(120, 40%, 85%);
+    --green8: hsl(120, 40%, 90%);
+    --green9: hsl(120, 40%, 95%);
+    
   }
 }
 
@@ -397,3 +429,10 @@ input {
     border-color: var(--primary9);
   }
 }
+
+input[type="text"] {
+  font-size: var(--font-lg);
+  margin: 0.5rem;
+  padding: var(--u-md);
+  text-align: center;
+  }
