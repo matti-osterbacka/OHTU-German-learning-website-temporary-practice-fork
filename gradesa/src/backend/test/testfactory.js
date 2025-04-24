@@ -2,7 +2,6 @@ import { isTest } from "../config";
 import { fa, faker } from "@faker-js/faker";
 import { createHash } from "node:crypto";
 import { DB } from "../db";
-import { title } from "node:process";
 
 /**
  * @description Factory function to create a model for a given table.
@@ -91,6 +90,29 @@ const freeFormAnswer = modelFactory(
   }
 );
 
+const anchor = modelFactory("anchors", () => ({
+  anchor_id: faker.lorem.word(),
+}));
+
+const exerciseAnchor = modelFactory(
+  "exercise_anchors",
+  () => (
+    {
+      position: faker.number.int({ min: 0, max: 100 }),
+    },
+    async (base) => {
+      if (!base.exercise_id) {
+        const exercise = await exercise();
+        base.exercise_id = exercise.id;
+      }
+      if (!base.anchor_id) {
+        const anchor = await anchor();
+        base.anchor_id = anchor.id;
+      }
+    }
+  )
+);
+
 const multichoiceExercise = modelFactory(
   "multichoice_exercises",
   {
@@ -150,6 +172,8 @@ export const TestFactory = {
   exercise,
   freeFormExercise,
   freeFormAnswer,
+  anchor,
+  exerciseAnchor,
   multichoiceExercise,
   multichoiceContent,
   multichoiceOption,
