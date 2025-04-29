@@ -1,14 +1,23 @@
 "use client";
-import styles from "../page.module.css";
+import styles from "../../../page.module.css";
 import "./admin.css";
 import { useState, useEffect } from "react";
 import { Dropdown } from "@/components/ui/dropdown";
 import { Button } from "@/components/ui/button";
 import { Row } from "@/components/ui/layout/container";
+import { useRequest } from "@/shared/hooks/useRequest";
+import { useRouter } from "next/navigation";
+import PreviewDragDrop from "@/components/ui/dragdrop/dragdrop_preview";
 
 export default function DragdropAdminPage() {
   const [numberOfFields, setNumberOfFields] = useState(null);
   const [inputFields, setInputFields] = useState([]);
+  const [title, setTitle] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [generalError, setGeneralError] = useState("");
+  const [showPreview, setShowPreview] = useState(false);
+  const makeRequest = useRequest();
+  const router = useRouter();
 
   useEffect(() => {
     if (numberOfFields) {
@@ -36,18 +45,87 @@ export default function DragdropAdminPage() {
     setInputFields(newInputFields);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.debug("Submitted text:", inputFields);
+  const handleSubmit = async () => {
+    try {
+      setIsSubmitting(true);
+      setGeneralError("");
+
+      const res = await makeRequest("/admin/exercises/dragdrop", {
+        title: title.trim(),
+        fields: inputFields,
+      });
+
+      if (res.status === 200) {
+        router.push("/admin/create-exercise");
+      }
+    } catch (e) {
+      console.error("Error creating dragdrop exercise:", e);
+
+      if (e.response?.data?.error) {
+        setGeneralError(e.response.data.error);
+      } else {
+        setGeneralError("Ein Fehler ist aufgetreten");
+      }
+      if (e.response?.status === 422) {
+        try {
+          const zodErrors = e.response?.data?.zodError;
+
+          const newErrors = zodErrorToFormErrors(zodErrors, formErrors);
+
+          setFormErrors(newErrors);
+        } catch (parseError) {
+          console.error("Error parsing validation results:", parseError);
+        }
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handlePreview = () => {
+    setShowPreview(true);
+  };
+
+  const handleCancel = () => {
+    router.push("/admin/create-exercise");
   };
 
   return (
     <div className={styles.page}>
       <div className="admin-container">
-        <h1>Create a Drag and Drop Exercise</h1>
+        <h1>Eine Drag-und-Drop-Übung erstellen</h1>
+        {generalError && (
+          <p className="error" role="alert">
+            {generalError}
+          </p>
+        )}
+        {showPreview && (
+          <div className="preview-modal">
+            <PreviewDragDrop title={title} fields={inputFields} />
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={() => setShowPreview(false)}
+            >
+              Vorschau schließen
+            </Button>
+          </div>
+        )}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="fieldCount">Number of boxes:</label>
+            <label htmlFor="title">Titel:</label>
+            <input
+              type="text"
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              className="form-input"
+              placeholder="Titel eingeben"
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="fieldCount">Anzahl der Felder</label>
             <Dropdown
               options={[
                 { label: "2", value: "2" },
@@ -61,8 +139,8 @@ export default function DragdropAdminPage() {
             >
               <Button size="md" variant="outline" width="fit">
                 {numberOfFields
-                  ? `Selected: ${numberOfFields}`
-                  : "Select number of boxes"}
+                  ? `Ausgewählte Anzahl: ${numberOfFields}`
+                  : "Anzahl der Felder"}
               </Button>
             </Dropdown>
           </div>
@@ -74,7 +152,7 @@ export default function DragdropAdminPage() {
                     <Dropdown
                       options={[
                         {
-                          label: "Red",
+                          label: "Rot",
                           value: "red",
                           style: {
                             backgroundColor: "var(--red)",
@@ -84,17 +162,17 @@ export default function DragdropAdminPage() {
                           },
                         },
                         {
-                          label: "Blue",
+                          label: "Blau",
                           value: "blue",
                           style: {
-                            backgroundColor: "var(--blue1)",
+                            backgroundColor: "var(--blue)",
                             width: "100%",
                             padding: "var(--u-xs)",
                             borderRadius: "var(--radius-sm)",
                           },
                         },
                         {
-                          label: "Green",
+                          label: "Grün",
                           value: "green",
                           style: {
                             backgroundColor: "var(--green)",
@@ -104,7 +182,7 @@ export default function DragdropAdminPage() {
                           },
                         },
                         {
-                          label: "Yellow",
+                          label: "Gelb",
                           value: "yellow",
                           style: {
                             backgroundColor: "var(--yellow)",
@@ -114,7 +192,7 @@ export default function DragdropAdminPage() {
                           },
                         },
                         {
-                          label: "Purple",
+                          label: "Lila",
                           value: "purple",
                           style: {
                             backgroundColor: "var(--purple)",
@@ -140,7 +218,7 @@ export default function DragdropAdminPage() {
                             : {}
                         }
                       >
-                        {field.color || "Select color"}
+                        {field.color || "Farbe"}
                       </Button>
                     </Dropdown>
                     <input
@@ -150,7 +228,7 @@ export default function DragdropAdminPage() {
                         handleInputChange(index, "category", e.target.value)
                       }
                       className="form-input"
-                      placeholder={`Enter category ${index + 1}`}
+                      placeholder={`Kategorie ${index + 1} eingeben`}
                     />
                   </Row>
                   <input
@@ -160,16 +238,52 @@ export default function DragdropAdminPage() {
                       handleInputChange(index, "content", e.target.value)
                     }
                     className="form-input"
-                    placeholder={`Enter words`}
+                    placeholder={`Wörter eingeben`}
                   />
                 </div>
               ))}
           </Row>
-          {numberOfFields && (
-            <Button type="submit" size="sm" variant="outline">
-              Create
+          <div className="button-group">
+            <Button
+              type="submit"
+              size="sm"
+              variant="outline"
+              onClick={handleSubmit}
+              disabled={
+                isSubmitting ||
+                !title.trim() ||
+                !numberOfFields ||
+                inputFields.some(
+                  (field) => !field.color || !field.category || !field.content
+                )
+              }
+            >
+              {isSubmitting ? "Wird erstellt..." : "Erstellen"}
             </Button>
-          )}
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={handlePreview}
+              disabled={
+                !title.trim() ||
+                !numberOfFields ||
+                inputFields.some(
+                  (field) => !field.color || !field.category || !field.content
+                )
+              }
+            >
+              Vorschau
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="tertiary"
+              onClick={handleCancel}
+            >
+              Abbrechen
+            </Button>
+          </div>
         </form>
       </div>
     </div>

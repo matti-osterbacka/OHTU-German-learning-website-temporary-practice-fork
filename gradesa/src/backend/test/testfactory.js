@@ -167,6 +167,21 @@ const clickExercise = modelFactory(
   async (base) => {}
 );
 
+const dragDropExercise = modelFactory(
+  "dnd_exercises",
+  {
+    title: faker.lorem.sentence(),
+    fields: [
+      {
+        color: faker.color.human(),
+        category: faker.lorem.word(),
+        content: faker.lorem.sentence(),
+      },
+    ],
+  },
+  async (base) => {}
+);
+
 export const TestFactory = {
   user,
   exercise,
@@ -178,4 +193,5 @@ export const TestFactory = {
   multichoiceContent,
   multichoiceOption,
   clickExercise,
+  dragDropExercise,
 };
