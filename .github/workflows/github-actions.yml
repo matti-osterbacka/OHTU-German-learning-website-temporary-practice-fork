@@ -53,3 +53,8 @@ jobs:
         working-directory: ./gradesa
         run: |
           npm run test
+      - name: Run e2e tests
+        working-directory: ./gradesa
+        run: |
+          npx playwright install --with-deps
+          npm run test:e2e
