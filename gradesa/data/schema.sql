@@ -183,12 +183,18 @@ CREATE TABLE public.exercise_anchors (
   updated_at timestamp with time zone NOT NULL DEFAULT now(),
   exercise_id bigint NOT NULL,
   anchor_id bigint NOT NULL,
-  position integer NOT NULL DEFAULT 0
+  position integer NOT NULL DEFAULT 0,
+  difficulty text NOT NULL DEFAULT 'medium'::text,
+  title text
 );
 
 CREATE INDEX exercise_anchors_anchor_id_idx ON public.exercise_anchors USING btree (anchor_id);
 
 CREATE INDEX exercise_anchors_exercise_id_idx ON public.exercise_anchors USING btree (exercise_id);
+
+ALTER TABLE public.exercise_anchors
+ADD CONSTRAINT exercise_anchors_difficulty_check
+CHECK ((difficulty = ANY (ARRAY['easy'::text, 'medium'::text, 'hard'::text])));
 
 ALTER TABLE public.exercise_anchors
 ADD CONSTRAINT exercise_anchors_exercise_id_anchor_id_key
